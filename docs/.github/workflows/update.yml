@@ -9,11 +9,13 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,6 +30,10 @@ jobs:
       - name: Update data files
         run: |
           python scripts/update_prices.py
+          echo "=== latest.json ==="
+          cat data/latest.json
+          echo "=== git status ==="
+          git status --porcelain
 
       - name: Commit & push if changed
         run: |
@@ -35,4 +41,4 @@ jobs:
           git config user.email "github-actions@github.com"
           git add data/latest.json data/history.csv
           git diff --cached --quiet || git commit -m "Update prices"
-          git push
+          git push origin HEAD:main
