@@ -1,0 +1,11 @@
+:root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+.container { max-width: 980px; margin: 24px auto; padding: 0 16px; }
+h1 { margin: 0 0 8px; }
+.muted { color: #555; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+button { padding: 6px 10px; cursor: pointer; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0 22px; }
+th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+th { background: #f6f6f6; }
+.scroll { overflow:auto; border: 1px solid #eee; border-radius: 8px; }
+.scroll table { margin: 0; border: 0; }
+.scroll th, .scroll td { white-space: nowrap; }
