@@ -1,4 +1,3 @@
-update.R
 pkgs <- c("tidyverse","lubridate","tidyquant","writexl","readr")
 new_pkgs <- pkgs[!(pkgs %in% installed.packages()[, "Package"])]
 if(length(new_pkgs)>0) install.packages(new_pkgs)
@@ -44,49 +43,3 @@ write_xlsx(
   list(close_pivot=close_pivot, index_pivot=index_pivot, prices_long=prices),
   path = "public/quantum_latest.xlsx"
 )
-public/index.html
-write_csv(close_pivot, "public/quantum_close_pivot.csv")
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <title>Quantum Stocks Auto</title>
-</head>
-<body>
-  <h1>Quantum Stocks (최근 1년) 자동 업데이트</h1>
-  <ul>
-    <li><a href="quantum_latest.xlsx">엑셀 다운로드 (.xlsx)</a></li>
-    <li><a href="quantum_close_pivot.csv">CSV 다운로드 (피벗)</a></li>
-  </ul>
-  <p>GitHub Actions로 주기적으로 업데이트됩니다.</p>
-</body>
-</html>
-.github/workflows/update.yml
-name: Update quantum data
-
-on:
-  schedule:
-    - cron: "*/5 * * * *"   # ✅ 5분마다
-  workflow_dispatch:
-
-permissions:
-  contents: write
-
-jobs:
-  run:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: r-lib/actions/setup-r@v2
-
-      - name: Run updater
-        run: Rscript update.R
-
-      - name: Commit & push
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add public/quantum_latest.xlsx public/quantum_close_pivot.csv public/last_updated.txt
-          git commit -m "auto: update data" || echo "No changes"
-          git push
