@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-01-13T21:00:19+00:00",
+  "generated_at_utc": "2026-01-13T21:42:44+00:00",
   "rows": [
     {
       "ticker": "QSI",
@@ -9,7 +9,7 @@
     },
     {
       "ticker": "QBTS",
-      "price_usd": 28.83,
+      "price_usd": 28.85,
       "price_time_utc": "2026-01-13T20:55:00+00:00",
       "source": "5m"
     },
