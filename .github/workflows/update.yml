@@ -1,0 +1,31 @@
+name: Update quantum stock data (5 min)
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # ✅ 5분마다
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Run updater
+        run: Rscript update.R
+
+      - name: Commit and push results
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add docs/quantum_latest.xlsx docs/quantum_close_pivot.csv docs/last_updated.txt
+          git commit -m "auto: update quantum data" || echo "No changes"
+          git push
