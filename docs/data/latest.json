@@ -1,0 +1,10 @@
+{
+  "generated_at_utc": "-",
+  "rows": [
+    {"ticker":"QSI","price_usd":null,"price_time_utc":null,"source":"init"},
+    {"ticker":"QBTS","price_usd":null,"price_time_utc":null,"source":"init"},
+    {"ticker":"RGTI","price_usd":null,"price_time_utc":null,"source":"init"},
+    {"ticker":"IONQ","price_usd":null,"price_time_utc":null,"source":"init"},
+    {"ticker":"QTUM","price_usd":null,"price_time_utc":null,"source":"init"}
+  ]
+}
