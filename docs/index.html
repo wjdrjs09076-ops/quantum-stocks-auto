@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quantum Tickers (5-min)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Quantum 가격표 (5분 간격 갱신)</h1>
+    <p class="muted">
+      마지막 업데이트: <span id="updatedAt">-</span>
+      <button id="refreshBtn" type="button">지금 새로고침</button>
+    </p>
+
+    <table id="priceTable">
+      <thead>
+        <tr>
+          <th>티커</th>
+          <th>이름</th>
+          <th>가격(USD)</th>
+          <th>시각(UTC)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>히스토리 (최근 N개)</h2>
+    <div class="scroll">
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>시각(UTC)</th>
+            <th>QSI</th>
+            <th>QBTS</th>
+            <th>RGTI</th>
+            <th>IONQ</th>
+            <th>QTUM</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
