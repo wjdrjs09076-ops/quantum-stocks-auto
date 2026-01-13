@@ -7,119 +7,93 @@ import yfinance as yf
 
 TICKERS = ["QSI", "QBTS", "RGTI", "IONQ", "QTUM"]
 
-DATA_DIR = "data"
+DATA_DIR = "docs/data"
 LATEST_JSON = os.path.join(DATA_DIR, "latest.json")
 HISTORY_CSV = os.path.join(DATA_DIR, "history.csv")
 
-def utc_now_iso():
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+def utc_now():
+    return datetime.now(timezone.utc).replace(microsecond=0)
 
-def ensure_data_dir():
+def utc_now_iso():
+    return utc_now().isoformat()
+
+def ensure_dir():
     os.makedirs(DATA_DIR, exist_ok=True)
 
-def fetch_latest_5m_prices(tickers):
+def fetch_price(ticker: str):
     """
-    각 티커별로 5분봉(최근 1~2일) 데이터를 받아서 마지막 종가를 사용.
-    yfinance는 간헐적으로 데이터가 없거나 지연될 수 있으니 예외 처리 포함.
+    1) 5분봉(5m) 마지막 Close 시도
+    2) 실패하면 fast_info.last_price로 폴백
     """
-    results = []
-
-    # interval=5m 은 보통 최근 며칠만 지원됨
-    for t in tickers:
-        try:
-            df = yf.download(
-                tickers=t,
-                period="2d",
-                interval="5m",
-                progress=False,
-                auto_adjust=False,
-                threads=False,
-            )
-            if df is None or df.empty:
-                results.append(
-                    {"ticker": t, "price_usd": None, "price_time_utc": None, "source": "yfinance"}
-                )
-                continue
-
-            # df index는 타임스탬프. 마지막 row 사용
+    # 1) 5분봉 시도
+    try:
+        df = yf.download(
+            ticker,
+            period="5d",
+            interval="5m",
+            progress=False,
+            threads=False,
+        )
+        if df is not None and not df.empty:
             last_ts = df.index[-1]
             last_close = float(df["Close"].iloc[-1])
 
-            # last_ts가 tz-aware 아닐 수 있어 안전하게 처리
-            # yfinance는 종종 tz-aware를 주기도 함
+            # 타임존 UTC로 정리
             if getattr(last_ts, "tzinfo", None) is None:
-                # tz 정보 없으면 UTC로 간주(완벽하지 않을 수 있음)
                 last_ts_utc = last_ts.to_pydatetime().replace(tzinfo=timezone.utc)
             else:
                 last_ts_utc = last_ts.to_pydatetime().astimezone(timezone.utc)
 
-            results.append(
-                {
-                    "ticker": t,
-                    "price_usd": round(last_close, 6),
-                    "price_time_utc": last_ts_utc.replace(microsecond=0).isoformat(),
-                    "source": "yfinance",
-                }
-            )
-        except Exception:
-            results.append(
-                {"ticker": t, "price_usd": None, "price_time_utc": None, "source": "yfinance"}
-            )
-
-    return results
-
-def write_latest_json(rows):
-    payload = {
-        "generated_at_utc": utc_now_iso(),
-        "rows": rows,
-    }
-    with open(LATEST_JSON, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
-
-def append_history_csv(rows):
-    """
-    history.csv 포맷:
-    timestamp_utc,QSI,QBTS,RGTI,IONQ,QTUM
-    """
-    ts = utc_now_iso()
-    row_map = {r["ticker"]: r["price_usd"] for r in rows}
-
-    new_row = {
-        "timestamp_utc": ts,
-        "QSI": row_map.get("QSI"),
-        "QBTS": row_map.get("QBTS"),
-        "RGTI": row_map.get("RGTI"),
-        "IONQ": row_map.get("IONQ"),
-        "QTUM": row_map.get("QTUM"),
-    }
-
-    file_exists = os.path.exists(HISTORY_CSV)
-    df_new = pd.DataFrame([new_row])
-
-    if not file_exists:
-        df_new.to_csv(HISTORY_CSV, index=False)
-        return
-
-    # 기존 CSV 읽어서 이어붙이기
-    try:
-        df_old = pd.read_csv(HISTORY_CSV)
-        df_all = pd.concat([df_old, df_new], ignore_index=True)
-
-        # 너무 커지지 않게 최근 N개만 유지 (예: 2000행)
-        MAX_ROWS = 2000
-        if len(df_all) > MAX_ROWS:
-            df_all = df_all.iloc[-MAX_ROWS:]
-
-        df_all.to_csv(HISTORY_CSV, index=False)
+            return last_close, last_ts_utc.replace(microsecond=0).isoformat(), "5m"
     except Exception:
-        # CSV가 깨졌거나 읽기 실패하면 새로 시작
-        df_new.to_csv(HISTORY_CSV, index=False)
+        pass
+
+    # 2) 폴백: fast_info
+    try:
+        tk = yf.Ticker(ticker)
+        fi = getattr(tk, "fast_info", None)
+        if fi and fi.get("last_price") is not None:
+            return float(fi["last_price"]), utc_now_iso(), "fast_info"
+    except Exception:
+        pass
+
+    return None, None, "none"
 
 def main():
-    ensure_data_dir()
-    rows = fetch_latest_5m_prices(TICKERS)
-    write_latest_json(rows)
-    append_history_csv(rows)
+    ensure_dir()
+
+    rows = []
+    hist_row = {"timestamp_utc": utc_now_iso()}
+
+    for t in TICKERS:
+        price, price_time, src = fetch_price(t)
+        rows.append({
+            "ticker": t,
+            "price_usd": (round(price, 6) if price is not None else None),
+            "price_time_utc": price_time,
+            "source": src,
+        })
+        hist_row[t] = price
+
+    # latest.json 저장
+    with open(LATEST_JSON, "w", encoding="utf-8") as f:
+        json.dump(
+            {"generated_at_utc": utc_now_iso(), "rows": rows},
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
+
+    # history.csv 이어쓰기(없으면 생성)
+    if not os.path.exists(HISTORY_CSV):
+        pd.DataFrame([hist_row]).to_csv(HISTORY_CSV, index=False)
+    else:
+        df_old = pd.read_csv(HISTORY_CSV)
+        df_all = pd.concat([df_old, pd.DataFrame([hist_row])], ignore_index=True)
+
+        # 너무 커지지 않게 최근 2000행 유지
+        df_all = df_all.iloc[-2000:]
+        df_all.to_csv(HISTORY_CSV, index=False)
 
 if __name__ == "__main__":
     main()
