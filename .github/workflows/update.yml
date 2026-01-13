@@ -31,7 +31,7 @@ jobs:
         run: |
           python scripts/update_prices.py
           echo "=== latest.json ==="
-          cat data/latest.json
+          cat docs/data/latest.json
           echo "=== git status ==="
           git status --porcelain
 
