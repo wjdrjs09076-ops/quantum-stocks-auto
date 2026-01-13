@@ -1,3 +1,4 @@
+update.R
 pkgs <- c("tidyverse","lubridate","tidyquant","writexl","readr")
 new_pkgs <- pkgs[!(pkgs %in% installed.packages()[, "Package"])]
 if(length(new_pkgs)>0) install.packages(new_pkgs)
@@ -43,7 +44,7 @@ write_xlsx(
   list(close_pivot=close_pivot, index_pivot=index_pivot, prices_long=prices),
   path = "public/quantum_latest.xlsx"
 )
-
+public/index.html
 write_csv(close_pivot, "public/quantum_close_pivot.csv")
 <!doctype html>
 <html lang="ko">
@@ -60,6 +61,7 @@ write_csv(close_pivot, "public/quantum_close_pivot.csv")
   <p>GitHub Actions로 주기적으로 업데이트됩니다.</p>
 </body>
 </html>
+.github/workflows/update.yml
 name: Update quantum data
 
 on:
