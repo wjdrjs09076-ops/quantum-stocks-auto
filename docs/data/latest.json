@@ -1,34 +1,34 @@
 {
-  "generated_at_utc": "2026-01-15T20:51:40+00:00",
+  "generated_at_utc": "2026-01-15T21:40:07+00:00",
   "rows": [
     {
       "ticker": "QSI",
-      "price_usd": 1.24,
-      "price_time_utc": "2026-01-15T20:50:00+00:00",
+      "price_usd": 1.235,
+      "price_time_utc": "2026-01-15T20:55:00+00:00",
       "source": "5m"
     },
     {
       "ticker": "QBTS",
-      "price_usd": 29.045,
-      "price_time_utc": "2026-01-15T20:50:00+00:00",
+      "price_usd": 28.745001,
+      "price_time_utc": "2026-01-15T20:55:00+00:00",
       "source": "5m"
     },
     {
       "ticker": "RGTI",
-      "price_usd": 25.059999,
-      "price_time_utc": "2026-01-15T20:50:00+00:00",
+      "price_usd": 24.709999,
+      "price_time_utc": "2026-01-15T20:55:00+00:00",
       "source": "5m"
     },
     {
       "ticker": "IONQ",
-      "price_usd": 47.91,
-      "price_time_utc": "2026-01-15T20:50:00+00:00",
+      "price_usd": 47.57,
+      "price_time_utc": "2026-01-15T20:55:00+00:00",
       "source": "5m"
     },
     {
       "ticker": "QTUM",
-      "price_usd": 118.264999,
-      "price_time_utc": "2026-01-15T20:50:00+00:00",
+      "price_usd": 118.110001,
+      "price_time_utc": "2026-01-15T20:55:00+00:00",
       "source": "5m"
     }
   ]
