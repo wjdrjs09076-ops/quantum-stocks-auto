@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-01-20T22:52:57+00:00",
+  "generated_at_utc": "2026-01-20T23:41:27+00:00",
   "rows": [
     {
       "ticker": "QSI",
@@ -27,7 +27,7 @@
     },
     {
       "ticker": "QTUM",
-      "price_usd": 116.080002,
+      "price_usd": 116.139999,
       "price_time_utc": "2026-01-20T20:55:00+00:00",
       "source": "5m"
     }
